@@ -182,4 +182,15 @@ function showFireworks() {
 spinBtn.addEventListener("click", () => {
   if (!isSpinning) {
     isSpinning = true;
-    resultDiv.textContent = "
+    resultDiv.textContent = "";
+    spin();
+    setTimeout(() => {
+      isSpinning = false;
+    }, 7000);
+  }
+});
+
+drawWheel();
+</script>
+</body>
+</html>
