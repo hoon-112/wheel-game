@@ -23,20 +23,15 @@
   }
   #pointer {
     position: absolute;
-    top: -18px; /* 화살표 위치 조금 내림 */
+    top: -18px;
     left: 50%;
     margin-left: -15px;
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-top: 30px solid red; /* 위쪽 화살표 */
+    border-top: 30px solid red;
     z-index: 10;
-  }
-  #result {
-    margin-top: 30px;
-    font-size: 28px;
-    font-weight: bold;
   }
   button {
     margin-top: 20px;
@@ -53,7 +48,6 @@
     <canvas id="wheel" width="400" height="400"></canvas>
   </div>
   <button id="spinBtn">돌리기!</button>
-  <div id="result"></div>
 
 <script>
   const canvas = document.getElementById("wheel");
@@ -64,6 +58,7 @@
     { color: "#fc3", value: "5,000P" },
     { color: "#399", value: "10,000P" },
     { color: "#96f", value: "치킨" },
+    { color: "#aaa", value: "꽝" }
   ];
   const segCount = segments.length;
   let startAngle = 0;
@@ -76,11 +71,9 @@
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 각 영역 그리기
     for (let i = 0; i < segCount; i++) {
       const angle = startAngle + i * segAngle;
 
-      // 영역 색상 채우기
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, angle, angle + segAngle);
@@ -92,7 +85,6 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 텍스트 쓰기 (중앙 위치, 각도 조정)
       ctx.save();
       ctx.fillStyle = "white";
       ctx.font = "bold 20px Arial";
@@ -104,7 +96,6 @@
     }
   }
 
-  // 회전 상태 변수
   let spinning = false;
   let angularVelocity = 0;
   let angularAcceleration = 0;
@@ -114,8 +105,8 @@
     if (spinning) return;
 
     spinning = true;
-    angularVelocity = Math.random() * 0.3 + 0.4; // 초기 속도 랜덤
-    angularAcceleration = 0.005; // 감속 값
+    angularVelocity = Math.random() * 0.3 + 0.4;
+    angularAcceleration = 0.005;
 
     function animate() {
       if (!spinning) return;
@@ -124,7 +115,7 @@
       if (angularVelocity <= 0) {
         angularVelocity = 0;
         spinning = false;
-        showResult();
+        // 결과 출력 부분 삭제
         return;
       }
 
@@ -137,18 +128,6 @@
     animate();
   }
 
-  function showResult() {
-    // pointer는 위쪽 12시 방향, 각도 계산
-    const normalizedAngle = (2 * Math.PI - (startAngle % (2 * Math.PI))) % (2 * Math.PI);
-    const segAngle = (2 * Math.PI) / segCount;
-    let index = Math.floor(normalizedAngle / segAngle);
-    index = index % segCount;
-
-    const result = segments[index];
-    document.getElementById("result").innerHTML = `🎉 축하합니다! 당첨: <strong>${result.value}</strong>`;
-  }
-
-  // 초기 돌림판 그리기
   drawWheel();
 
   document.getElementById("spinBtn").addEventListener("click", spin);
