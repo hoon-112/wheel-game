@@ -22,14 +22,14 @@
   }
   #pointer {
     position: absolute;
-    top: -20px;  /* 위로 올림 */
+    top: -30px;  /* 더 위로 올림 */
     left: 50%;
-    margin-left: -15px; /* 화살표 너비 절반 */
+    margin-left: -15px;
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-top: 30px solid red; /* 방향 반대로 변경 */
+    border-top: 30px solid red; /* 위쪽 화살표 */
     z-index: 10;
   }
   #result {
@@ -45,7 +45,6 @@
     font-size: 18px;
     cursor: pointer;
   }
-  /* 폭죽 효과 */
   .firework {
     position: absolute;
     width: 150px;
@@ -99,7 +98,7 @@ const centerY = canvas.height / 2;
 const radius = 180;
 
 let startAngle = 0;
-let arc = (2 * Math.PI) / segments.length;
+const arc = (2 * Math.PI) / segments.length;
 let isSpinning = false;
 let spinTimeout;
 let spinAngleStart = 0;
@@ -122,7 +121,7 @@ function drawSegment(index, angle) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = "bold 20px Arial";
-  ctx.fillText(segments[index], radius * 0.5, 0);  // 텍스트 위치 가운데로 조정
+  ctx.fillText(segments[index], radius * 0.65, 0);  // 글자 위치를 조금 더 바깥쪽으로 조정
 
   ctx.restore();
 }
@@ -135,9 +134,9 @@ function drawWheel() {
 }
 
 function spin() {
-  spinAngleStart = Math.random() * 10 + 10;
+  spinAngleStart = Math.random() * 30 + 40; // 초기 각도 더 크게 (빠르고 많이 돌게)
   spinTime = 0;
-  spinTimeTotal = (Math.random() * 3 + 4) * 1000; // 4~7초 돌림
+  spinTimeTotal = (Math.random() * 2 + 3) * 1000; // 3~5초 돌림 (좀 더 빠르게)
   rotateWheel();
 }
 
@@ -155,11 +154,10 @@ function rotateWheel() {
 
 function stopRotateWheel() {
   clearTimeout(spinTimeout);
-  // 화살표가 위를 가리키므로 270도 보정
-  const degrees = (startAngle * 180) / Math.PI + 270;
+  const degrees = (startAngle * 180) / Math.PI + 270;  // 270도 보정 (화살표가 위쪽)
   const arcd = (arc * 180) / Math.PI;
   let index = Math.floor((360 - (degrees % 360)) / arcd);
-  index = index % segments.length;  // 범위 내 보정
+  index = index % segments.length;
   const selected = segments[index];
   resultDiv.textContent = `🎉 축하합니다! 당첨: ${selected}`;
   showFireworks();
@@ -191,7 +189,7 @@ spinBtn.addEventListener("click", () => {
     spin();
     setTimeout(() => {
       isSpinning = false;
-    }, 7000);
+    }, 6000);
   }
 });
 
