@@ -15,11 +15,16 @@
     border-radius: 50%;
     box-shadow: 0 0 20px #aaa;
   }
+  #container {
+    position: relative;
+    width: 400px;
+    margin: 0 auto;
+  }
   #pointer {
     position: absolute;
-    top: 138px;
+    top: 10px;  /* 캔버스 위쪽 중앙 */
     left: 50%;
-    margin-left: -15px;
+    margin-left: -15px; /* 화살표 너비의 절반 */
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
@@ -32,24 +37,42 @@
     font-size: 28px;
     font-weight: bold;
     color: #333;
-    height: 60px;
-  }
-  #container {
-    position: relative;
-    width: 400px;
-    margin: 0 auto;
+    min-height: 60px;
   }
   #spinBtn {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 18px;
+    cursor: pointer;
   }
-  /* 폭죽 효과 간단 스타일 */
+  /* 폭죽 효과 */
   .firework {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     pointer-events: none;
+    border-radius: 50%;
+    animation: explode 1s ease-out forwards;
+  }
+  @keyframes explode {
+    0% {
+      opacity: 1;
+      transform: scale(0.3);
+      box-shadow:
+        0 -30px 20px #f00,
+        21px -21px 20px #ff0,
+        30px 0 20px #0f0,
+        21px 21px 20px #0ff,
+        0 30px 20px #00f,
+        -21px 21px 20px #f0f,
+        -30px 0 20px #fff,
+        -21px -21px 20px #ffa500;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.5);
+      box-shadow: none;
+    }
   }
 </style>
 </head>
@@ -111,7 +134,7 @@ function drawWheel() {
 function spin() {
   spinAngleStart = Math.random() * 10 + 10;
   spinTime = 0;
-  spinTimeTotal = Math.random() * 3 + 4 * 1000; // 4~7초 돌림
+  spinTimeTotal = (Math.random() * 3 + 4) * 1000; // 4~7초 돌림 (수정)
   rotateWheel();
 }
 
@@ -144,38 +167,19 @@ function easeOut(t, b, c, d) {
 }
 
 function showFireworks() {
-  // 간단한 폭죽 애니메이션 (5초간)
+  const container = document.getElementById("container");
   const fw = document.createElement("div");
   fw.className = "firework";
-  fw.style.left = centerX - 50 + "px";
-  fw.style.top = centerY - 50 + "px";
-  document.getElementById("container").appendChild(fw);
+  fw.style.left = centerX - 75 + "px";
+  fw.style.top = centerY - 75 + "px";
+  container.appendChild(fw);
 
-  let count = 0;
-  const interval = setInterval(() => {
-    fw.style.background = `radial-gradient(circle at ${Math.random() * 100}% ${Math.random() * 100}%, #FF0, transparent 70%)`;
-    count++;
-    if (count > 15) {
-      clearInterval(interval);
-      fw.remove();
-    }
-  }, 200);
+  setTimeout(() => {
+    fw.remove();
+  }, 1000);
 }
 
 spinBtn.addEventListener("click", () => {
   if (!isSpinning) {
     isSpinning = true;
-    resultDiv.textContent = "";
-    spin();
-    setTimeout(() => {
-      isSpinning = false;
-    }, 7000); // 7초 후 다시 돌릴 수 있음
-  }
-});
-
-drawWheel();
-</script>
-</body>
-</html>
-
-
+    resultDiv.textContent = "
