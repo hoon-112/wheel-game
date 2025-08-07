@@ -23,7 +23,7 @@
   }
   #pointer {
     position: absolute;
-    top: -10px; /* 화살표 위치 약간 내림 */
+    top: -10px; 
     left: 50%;
     margin-left: -15px;
     width: 0;
@@ -70,9 +70,6 @@
   const radius = 180;
   let startAngle = 0;
 
-  // 글자 위치 각도 조정용 (글자가 원 중심쪽으로 살짝 붙도록)
-  const textRadiusOffset = 60;
-
   function drawSegment(index, angleStart, angleEnd) {
     const segment = segments[index];
     ctx.beginPath();
@@ -80,7 +77,6 @@
     ctx.arc(centerX, centerY, radius, angleStart, angleEnd);
     ctx.closePath();
 
-    // 색칠
     ctx.fillStyle = segment.color;
     ctx.fill();
 
@@ -90,47 +86,77 @@
     ctx.font = "bold 20px Arial";
     ctx.translate(centerX, centerY);
 
-    // 각 섹터 중앙 각도 구하기
-    const angle = (angleStart + angleEnd) / 2;
-    ctx.rotate(angle);
+    const textAngle = (angleStart + angleEnd) / 2;
+    ctx.rotate(textAngle);
 
-    // 텍스트 위치 (중심으로부터 radius - textRadiusOffset 만큼 떨어지게)
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(segment.text, radius - textRadiusOffset, 0);
+    ctx.fillText(segment.text, radius - 60, 0);
     ctx.restore();
   }
 
   function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const segAngle = (2 * Math.PI) / segments.length;
-    for (let i = 0; i < segments.length; i++) {
-      const angleStart = startAngle + i * segAngle;
-      const angleEnd = angleStart + segAngle;
+    const segmentCount = segments.length;
+    const arcSize = (2 * Math.PI) / segmentCount;
+
+    for (let i = 0; i < segmentCount; i++) {
+      const angleStart = startAngle + i * arcSize;
+      const angleEnd = angleStart + arcSize;
       drawSegment(i, angleStart, angleEnd);
     }
 
-    // 흰색 원 (중앙 빈 공간)
+    // 중앙 흰 원
     ctx.beginPath();
     ctx.fillStyle = "white";
     ctx.arc(centerX, centerY, 60, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.closePath();
   }
 
   drawWheel();
 
-  // 회전 변수
-  let angularVelocity = 0; // 각속도
-  let angularAcceleration = 0; // 감속값
   let spinning = false;
+  let angularVelocity = 0;
+  let angularAcceleration = 0;
   let currentAngle = 0;
 
   function spin() {
     if (spinning) return;
 
     spinning = true;
-    angularVelocity = Math.random() * 0.3 + 0.4; // 빠르게 시작 (0.4 ~ 0.7 rad/frame)
-    angularAcceleration = 0.005; // 감속 (양수)
+    angularVelocity = Math.random() * 0.3 + 0.4;
+    angularAcceleration = 0.005;
 
-    fun
+    function animate() {
+      if (!spinning) return;
+
+      angularVelocity -= angularAcceleration;
+      if (angularVelocity <= 0) {
+        angularVelocity = 0;
+        spinning = false;
+        showResult();
+        return;
+      }
+
+      currentAngle += angularVelocity;
+      startAngle = currentAngle % (2 * Math.PI);
+      drawWheel();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+
+  function showResult() {
+    const normalizedAngle = (2 * Math.PI - (startAngle % (2 * Math.PI))) % (2 * Math.PI);
+    const segAngle = (2 * Math.PI) / segments.length;
+    const index = Math.floor(normalizedAngle / segAngle) % segments.length;
+    const result = segments[index];
+    document.getElementById("result").innerHTML = `🎉 축하합니다! 당첨: <strong>${result.value}</strong>`;
+  }
+
+  document.getElementById("spinButton").addEventListener("click", spin);
+</script>
+
+</body>
+</html>
