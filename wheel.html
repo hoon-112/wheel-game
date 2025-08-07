@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>돌림판 게임</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: 'Arial';
+      background: #f3f3f3;
+      padding-top: 50px;
+    }
+    canvas {
+      border: 8px solid #444;
+      border-radius: 50%;
+      box-shadow: 0 0 20px #aaa;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+    #pointer {
+      position: absolute;
+      top: 138px;
+      left: 50%;
+      margin-left: -15px;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid red;
+      z-index: 10;
+    }
+    #container {
+      position: relative;
+      width: 400px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 돌림판 게임</h1>
+  <div id="container">
+    <div id="pointer"></div>
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
+  <div id="result">돌림판을 클릭해보세요!</div>
+
+  <script>
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const segments = ["1,000P", "3,000P", "5,000P", "10,000P", "치킨"];
+    const colors = ["#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#E91E63"];
+    const numSegments = segments.length;
+    const arc = Math.PI * 2 / numSegments;
+    let angle = 0;
+    let isSpinning = false;
+
+    function drawWheel() {
+      for (let i = 0; i < numSegments; i++) {
+        const startAngle = angle + i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(200, 200);
+        ctx.arc(200, 200, 180, startAngle, startAngle + arc);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(200, 200);
+        ctx.rotate(startAngle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(segments[i], 160, 10);
+        ctx.restore();
+      }
+    }
+
+    function rotateWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      const spinAngle = Math.random() * 360 + 360 * 5; // 최소 5바퀴 + 랜덤
+      const duration = 5000; // 회전 시간 (ms)
+      const start = performance.now();
+
+      function animate(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentAngle = spinAngle * easeOut;
+        angle = (currentAngle * Math.PI / 180) % (2 * Math.PI);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawWheel();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          showResult();
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function showResult() {
+      const degrees = angle * 180 / Math.PI;
+      const adjusted = (360 - degrees + 90) % 360;
+      const index = Math.floor(adjusted / (360 / numSegments));
+      const result = segments[index];
+      document.getElementById("result").textContent = `🎉 당첨: ${result}`;
+    }
+
+    drawWheel();
+    canvas.addEventListener("click", rotateWheel);
+  </script>
+</body>
+</html>
