@@ -22,14 +22,14 @@
   }
   #pointer {
     position: absolute;
-    top: 10px;  
+    top: -20px;  /* 화살표를 캔버스 위쪽에서 더 위로 */
     left: 50%;
-    margin-left: -15px; 
+    margin-left: -15px; /* 화살표 너비 절반 */
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-bottom: 30px solid red;
+    border-top: 30px solid red; /* 아래쪽이 아닌 위쪽을 빨간 삼각형으로 */
     z-index: 10;
   }
   #result {
@@ -45,6 +45,7 @@
     font-size: 18px;
     cursor: pointer;
   }
+  /* 폭죽 효과 */
   .firework {
     position: absolute;
     width: 150px;
@@ -116,20 +117,12 @@ function drawSegment(index, angle) {
   ctx.save();
   ctx.fillStyle = "#fff";
   ctx.translate(centerX, centerY);
+  ctx.rotate(angle + arc / 2);
 
-  let textAngle = angle + arc / 2;
-
-  if (textAngle > Math.PI / 2 && textAngle < 3 * Math.PI / 2) {
-    ctx.rotate(textAngle + Math.PI);
-    ctx.textAlign = "right";
-  } else {
-    ctx.rotate(textAngle);
-    ctx.textAlign = "left";
-  }
-
+  ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = "bold 20px Arial";
-  ctx.fillText(segments[index], radius * 0.7, 0);
+  ctx.fillText(segments[index], radius * 0.6, 0);
 
   ctx.restore();
 }
@@ -144,7 +137,7 @@ function drawWheel() {
 function spin() {
   spinAngleStart = Math.random() * 10 + 10;
   spinTime = 0;
-  spinTimeTotal = (Math.random() * 3 + 4) * 1000;
+  spinTimeTotal = (Math.random() * 3 + 4) * 1000; // 4~7초 돌림
   rotateWheel();
 }
 
@@ -162,7 +155,7 @@ function rotateWheel() {
 
 function stopRotateWheel() {
   clearTimeout(spinTimeout);
-  const degrees = (startAngle * 180) / Math.PI + 90;
+  const degrees = (startAngle * 180) / Math.PI + 270; // 270도 보정 (pointer가 위쪽을 가르키도록)
   const arcd = (arc * 180) / Math.PI;
   const index = Math.floor((360 - (degrees % 360)) / arcd);
   const selected = segments[index];
