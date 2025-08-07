@@ -57,6 +57,8 @@
 <script>
   const canvas = document.getElementById("wheel");
   const ctx = canvas.getContext("2d");
+
+  // 상품명과 색상 배열 (사용자 이미지와 맞게 변경)
   const segments = [
     { text: "1,000P", value: "1,000P", color: "#FF6171" },
     { text: "3,000P", value: "3,000P", color: "#3D9BE9" },
@@ -83,7 +85,7 @@
     // 글자 쓰기
     ctx.save();
     ctx.fillStyle = "white";
-    ctx.font = "bold 20px Arial";
+    ctx.font = "bold 22px Arial";
     ctx.translate(centerX, centerY);
 
     const textAngle = (angleStart + angleEnd) / 2;
@@ -91,7 +93,9 @@
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(segment.text, radius - 60, 0);
+
+    // 글자 위치 조정: 반지름 - 70 정도 떨어진 곳
+    ctx.fillText(segment.text, radius - 70, 0);
     ctx.restore();
   }
 
@@ -106,11 +110,7 @@
       drawSegment(i, angleStart, angleEnd);
     }
 
-    // 중앙 흰 원
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.arc(centerX, centerY, 60, 0, 2 * Math.PI);
-    ctx.fill();
+    // 가운데 흰 원 제거 (아예 안 그림)
   }
 
   drawWheel();
@@ -152,6 +152,8 @@
     const segAngle = (2 * Math.PI) / segments.length;
     const index = Math.floor(normalizedAngle / segAngle) % segments.length;
     const result = segments[index];
+
+    // 아래 당첨 메시지를 사용자 이미지처럼 "🎉 축하합니다! 당첨: **상품명**" 형식으로 수정
     document.getElementById("result").innerHTML = `🎉 축하합니다! 당첨: <strong>${result.value}</strong>`;
   }
 
