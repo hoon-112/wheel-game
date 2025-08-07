@@ -22,9 +22,9 @@
   }
   #pointer {
     position: absolute;
-    top: 10px;  /* 캔버스 위쪽 중앙 */
+    top: 10px;  
     left: 50%;
-    margin-left: -15px; /* 화살표 너비 절반 */
+    margin-left: -15px; 
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
@@ -45,7 +45,6 @@
     font-size: 18px;
     cursor: pointer;
   }
-  /* 폭죽 효과 */
   .firework {
     position: absolute;
     width: 150px;
@@ -118,14 +117,11 @@ function drawSegment(index, angle) {
   ctx.fillStyle = "#fff";
   ctx.translate(centerX, centerY);
 
-  // 텍스트 회전 각도 계산
   let textAngle = angle + arc / 2;
 
-  // 텍스트가 거꾸로 나오지 않도록 보정
-  if (textAngle > Math.PI / 2 && textAngle < (3 * Math.PI) / 2) {
-    textAngle += Math.PI;
-    ctx.rotate(textAngle);
-    ctx.textAlign = "right";  // 텍스트 방향에 따라 정렬 조정
+  if (textAngle > Math.PI / 2 && textAngle < 3 * Math.PI / 2) {
+    ctx.rotate(textAngle + Math.PI);
+    ctx.textAlign = "right";
   } else {
     ctx.rotate(textAngle);
     ctx.textAlign = "left";
@@ -148,7 +144,7 @@ function drawWheel() {
 function spin() {
   spinAngleStart = Math.random() * 10 + 10;
   spinTime = 0;
-  spinTimeTotal = (Math.random() * 3 + 4) * 1000; // 4~7초 돌림
+  spinTimeTotal = (Math.random() * 3 + 4) * 1000;
   rotateWheel();
 }
 
@@ -166,7 +162,7 @@ function rotateWheel() {
 
 function stopRotateWheel() {
   clearTimeout(spinTimeout);
-  const degrees = (startAngle * 180) / Math.PI + 90; // pointer 맞추기 위해 +90도
+  const degrees = (startAngle * 180) / Math.PI + 90;
   const arcd = (arc * 180) / Math.PI;
   const index = Math.floor((360 - (degrees % 360)) / arcd);
   const selected = segments[index];
