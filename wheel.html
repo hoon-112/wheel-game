@@ -1,1 +1,181 @@
-Delete wheel.html content
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>돌림판 게임</title>
+<style>
+  body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+    padding-top: 50px;
+  }
+  canvas {
+    border: 5px solid #444;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #aaa;
+  }
+  #pointer {
+    position: absolute;
+    top: 138px;
+    left: 50%;
+    margin-left: -15px;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 30px solid red;
+    z-index: 10;
+  }
+  #result {
+    margin-top: 30px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    height: 60px;
+  }
+  #container {
+    position: relative;
+    width: 400px;
+    margin: 0 auto;
+  }
+  #spinBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+  /* 폭죽 효과 간단 스타일 */
+  .firework {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <h1>돌림판 게임</h1>
+  <div id="container">
+    <canvas id="wheel" width="400" height="400"></canvas>
+    <div id="pointer"></div>
+  </div>
+  <button id="spinBtn">돌리기!</button>
+  <div id="result"></div>
+
+<script>
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const resultDiv = document.getElementById("result");
+const spinBtn = document.getElementById("spinBtn");
+
+const segments = ["1,000P", "3,000P", "5,000P", "10,000P", "치킨"];
+const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius = 180;
+
+let startAngle = 0;
+let arc = (2 * Math.PI) / segments.length;
+let isSpinning = false;
+let spinTimeout;
+let spinAngleStart = 0;
+let spinTime = 0;
+let spinTimeTotal = 0;
+
+function drawSegment(index, angle) {
+  ctx.beginPath();
+  ctx.fillStyle = colors[index];
+  ctx.moveTo(centerX, centerY);
+  ctx.arc(centerX, centerY, radius, angle, angle + arc);
+  ctx.lineTo(centerX, centerY);
+  ctx.fill();
+
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.translate(centerX, centerY);
+  ctx.rotate(angle + arc / 2);
+  ctx.textAlign = "right";
+  ctx.font = "bold 20px Arial";
+  ctx.fillText(segments[index], radius - 10, 10);
+  ctx.restore();
+}
+
+function drawWheel() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < segments.length; i++) {
+    drawSegment(i, startAngle + i * arc);
+  }
+}
+
+function spin() {
+  spinAngleStart = Math.random() * 10 + 10;
+  spinTime = 0;
+  spinTimeTotal = Math.random() * 3 + 4 * 1000; // 4~7초 돌림
+  rotateWheel();
+}
+
+function rotateWheel() {
+  spinTime += 30;
+  if (spinTime >= spinTimeTotal) {
+    stopRotateWheel();
+    return;
+  }
+  let spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+  startAngle += (spinAngle * Math.PI) / 180;
+  drawWheel();
+  spinTimeout = setTimeout(rotateWheel, 30);
+}
+
+function stopRotateWheel() {
+  clearTimeout(spinTimeout);
+  const degrees = (startAngle * 180) / Math.PI + 90; // pointer 맞추기 위해 +90도
+  const arcd = (arc * 180) / Math.PI;
+  const index = Math.floor((360 - (degrees % 360)) / arcd);
+  const selected = segments[index];
+  resultDiv.textContent = `🎉 축하합니다! 당첨: ${selected}`;
+  showFireworks();
+}
+
+function easeOut(t, b, c, d) {
+  const ts = (t /= d) * t;
+  const tc = ts * t;
+  return b + c * (tc + -3 * ts + 3 * t);
+}
+
+function showFireworks() {
+  // 간단한 폭죽 애니메이션 (5초간)
+  const fw = document.createElement("div");
+  fw.className = "firework";
+  fw.style.left = centerX - 50 + "px";
+  fw.style.top = centerY - 50 + "px";
+  document.getElementById("container").appendChild(fw);
+
+  let count = 0;
+  const interval = setInterval(() => {
+    fw.style.background = `radial-gradient(circle at ${Math.random() * 100}% ${Math.random() * 100}%, #FF0, transparent 70%)`;
+    count++;
+    if (count > 15) {
+      clearInterval(interval);
+      fw.remove();
+    }
+  }, 200);
+}
+
+spinBtn.addEventListener("click", () => {
+  if (!isSpinning) {
+    isSpinning = true;
+    resultDiv.textContent = "";
+    spin();
+    setTimeout(() => {
+      isSpinning = false;
+    }, 7000); // 7초 후 다시 돌릴 수 있음
+  }
+});
+
+drawWheel();
+</script>
+</body>
+</html>
+
+
